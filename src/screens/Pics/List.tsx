@@ -5,6 +5,8 @@ import { Card, ListItem, Button, Icon } from 'react-native-elements'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 import HeaderTitle from "./../../components/HeaderTitle";
+import API from "./../../utils/api";
+import {usersRef} from './../../utils/firebase';
 
 const S = StyleSheet.create({
   container: {
@@ -18,11 +20,11 @@ const S = StyleSheet.create({
   },
   itemImage:{
     width: ("100%"),
-    height: hp("95%")
+    height: hp("25%")
   }
 });
 
-class HomeScreen extends React.Component {
+class PicsListScreen extends React.Component {
   state = {
     listEX: [
       {
@@ -36,6 +38,17 @@ class HomeScreen extends React.Component {
         subtitle: 'Vice Chairman'
       }
     ]
+  };
+
+  componentDidMount(){
+    // let response = API.get(`/users`).then(res => {
+    //     const persons = res.data;
+    //     this.setState({ persons });
+    //   }).catch((error) => {
+    //     console.warn(error)
+    //   })
+    //   console.warn(response)
+    usersRef.push().set({hola:'hola'});
   };
 
   render() {
@@ -63,4 +76,4 @@ class HomeScreen extends React.Component {
   }
 };
 
-export default HomeScreen;
+export default PicsListScreen;

@@ -46,7 +46,12 @@ const S = StyleSheet.create({
 
 class LoginScreen extends React.Component {
 
+  componentWillMount(){
+    this.props.navigation.navigate("PicsListScreen");
+  }; 
+
   render() {
+    
     return (
       <View style={S.container}>
         <Image style={S.headerLogo} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png' }} />
