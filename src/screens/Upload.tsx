@@ -1,26 +1,34 @@
 import React from 'react';
 import { Text } from 'galio-framework';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
-
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import RNFetchBlob from 'react-native-fetch-blob'
 
 import HeaderTitle from "../components/HeaderTitle";
+import { databaseRef, storageRef } from './../utils/firebase';
 
 const S = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 22
   },
-  cameraContainer: { 
+  cameraContainer: {
     height: hp("60%")
   },
-  itemImage:{
+  itemImage: {
     width: '50%',
     height: 90
   }
 });
+
+// Prepare Blob support
+// const Blob = RNFetchBlob.polyfill.Blob
+// const fs = RNFetchBlob.fs
+// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+// window.Blob = Blob
+
 
 class UploadScreen extends React.Component {
   state = {
@@ -37,8 +45,16 @@ class UploadScreen extends React.Component {
   snap = async () => {
     if (this.camera) {
       let photo = await this.camera.takePictureAsync();
-      console.warn(photo)
-      this.setState({picURL: photo.uri})
+
+      var store = storageRef.ref().child('productImages/');
+      const uploadUri = Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri
+
+      const metadata = {
+        contentType: 'image/png'
+      };
+
+      console.warn(uploadUri)
+      console.warn(store)
     }
   };
 
@@ -52,14 +68,14 @@ class UploadScreen extends React.Component {
       return (
         <View style={S.container}>
           <HeaderTitle title="Upload" />
-          <Camera 
-            style={S.cameraContainer} 
+          <Camera
+            style={S.cameraContainer}
             type={this.state.type}
             ref={ref => {
               this.camera = ref;
             }}
-            >
-          </Camera>
+          >
+          </Camera> 
           <View
             style={{
               flex: 1,
@@ -74,7 +90,7 @@ class UploadScreen extends React.Component {
                 alignItems: 'center',
               }}
               onPress={() => { this.snap() }}>
-              <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+              <Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> SNAP </Text>
             </TouchableOpacity>
           </View>
         </View>

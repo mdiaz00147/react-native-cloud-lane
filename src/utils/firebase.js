@@ -1,13 +1,13 @@
 import * as firebase from 'firebase';
+// import firebase from 'react-native-firebase';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   databaseURL: "https://minpic-cf86d.firebaseio.com",
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: "ENTER YOURS HERE",
-  messagingSenderId: "ENTER YOURS HERE"
+  storageBucket: "minpic-cf86d.appspot.com",
 }
 firebase.initializeApp(config);
-const databaseRef = firebase.database().ref();
-export const usersRef = databaseRef.child("users")
+export const storageRef = firebase.storage();
+export const databaseRef = firebase.database();
