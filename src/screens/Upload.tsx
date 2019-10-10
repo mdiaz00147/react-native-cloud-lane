@@ -1,12 +1,10 @@
 import React from 'react';
 import { Text } from 'galio-framework';
-import { StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ImageBackground, ActivityIndicator } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import RNFetchBlob from "react-native-fetch-blob";
-import * as FileSystem from 'expo-file-system';
-import { Base64 } from 'js-base64';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import HeaderTitle from "../components/HeaderTitle";
 import { databaseRef, storageRef } from './../utils/firebase';
@@ -17,11 +15,26 @@ const S = StyleSheet.create({
     paddingTop: 22
   },
   cameraContainer: {
-    height: hp("60%")
+    height: hp("100%"),
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   itemImage: {
-    width: '50%',
-    height: 90
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: hp("100%"),
+    opacity: 0.9
+  },
+  actionsContainer: {
+    display: 'flex',
+    height: hp("6.8%"), 
+    width: wp("14.5%"),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp("40%"),
+    borderRadius: wp("40%")
   }
 });
 
@@ -39,31 +52,52 @@ class UploadScreen extends React.Component {
   }
 
   snap = async () => {
-    this.setState({ loading: true })
     if (this.camera) {
       let photo = await this.camera.takePictureAsync();
-      this.uploadAsFile(photo.uri)
-    }
+      this.setState({ picURL: photo.uri });
+      this.uploadAsFile(photo.uri);
+    } 
   };
 
   uploadAsFile = async (uri) => {
+    this.setState({ loading: true });
     let ref = storageRef.ref();
-    ref = ref.child('Ariaana.jpg');
+    ref = ref.child('dos.jpg');
 
-    const response = await fetch(uri);
-    const blob = await response.blob();
+    const response  = await fetch(uri);
+    const blob      = await response.blob();
 
     var metadata = {
       contentType: 'image/jpeg',
     };
-    const task = ref.put(blob, metadata).then(function(snapshot) {
-      console.warn('Uploaded a base64 string!');
+    const task = ref.put(blob, metadata).then((snapshot) => {
+      this.setState({ loading: false });
+
     });
-    
+
   }
 
   render() {
     const { hasCameraPermission } = this.state;
+    let loadingColor = this.state.loading ? ({backgroundColor: '#c8b476' }) : ({backgroundColor: '#666666'});
+     
+    const actions = (
+      <View
+        style={[S.actionsContainer, loadingColor ]}>
+        {
+          this.state.loading ? (
+            <TouchableOpacity>
+              <ActivityIndicator size={"large"} color="#fff" />
+            </TouchableOpacity>
+          ) : (
+              <TouchableOpacity
+                onPress={() => { this.snap() }}>
+                <Icon name="ios-american-football" size={30} color={'white'} />
+              </TouchableOpacity>
+            )
+        }
+      </View>);
+
     if (hasCameraPermission === null) {
       return <View />;
     } else if (hasCameraPermission === false) {
@@ -72,35 +106,19 @@ class UploadScreen extends React.Component {
       return (
         <View style={S.container}>
           <HeaderTitle title="Upload" />
-          <Camera
-            style={S.cameraContainer}
-            type={this.state.type}
-            ref={ref => {
-              this.camera = ref;
-            }}
-          >
-          </Camera>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'transparent',
-              flexDirection: 'row',
-            }}>
-            <Image style={S.itemImage} source={{ uri: this.state.picURL }} />
-            {
-              this.state.loading ? (<Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> Subiendo puta foto </Text>) : (
-                <TouchableOpacity
-                  style={{
-                    flex: 0.1,
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                  }}
-                  onPress={() => { this.snap() }}>
-                  <Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> SNAP </Text>
-                </TouchableOpacity>
-              )
-            }
-          </View>
+          {this.state.loading ? (
+            <ImageBackground style={S.itemImage} source={{ uri: this.state.picURL }} >
+              {actions}
+            </ImageBackground>
+          ) : (
+              <Camera
+                style={S.cameraContainer}
+                type={this.state.type}
+                ref={ref => { this.camera = ref; }}
+              >
+                {actions}
+              </Camera>
+            )}
         </View>
       );
     }

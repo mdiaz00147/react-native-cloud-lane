@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from 'react-native-vector-icons/Ionicons';
 
 const S = StyleSheet.create({
   container: { flexDirection: "row", height: 80, elevation: 2, backgroundColor: '#1973b1' },
