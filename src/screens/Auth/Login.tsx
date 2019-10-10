@@ -47,7 +47,7 @@ const S = StyleSheet.create({
 class LoginScreen extends React.Component {
 
   componentWillMount(){
-    this.props.navigation.navigate("UploadScreen");
+    this.props.navigation.navigate("PicsListScreen");
   }; 
 
   render() {

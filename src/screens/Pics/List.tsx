@@ -26,31 +26,34 @@ const S = StyleSheet.create({
 
 class PicsListScreen extends React.Component {
   state = {
-    listEX: [
-      {
-        id: 1,
-        name: 'Amy Farha',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Vice President'
-      },
-      {
-        id: 2,
-        name: 'Chris Jackson',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-        subtitle: 'Vice Chairman'
-      }
-    ]
+    listEX: []
   };
 
   componentDidMount() {
-    // databaseRef.ref('users/').child(12).set({ name: 'mario andres'});
-    // let userRef = databaseRef.ref('users/' + 11);
-    // userRef.remove()
+    // databaseRef.ref('users/').child(12).set({name:'mario', pics:[2,1,4]}); 
+    // databaseRef.ref('users/').child(12).child('pics').push(5544); 
+
+
+    databaseRef.ref('users/').child(12).child('pics').on('value', (snapshot) => {
+      let values = Object.keys(snapshot.val());
+
+      let objects = Object.values(snapshot.val()).map((item, index) => {
+        return {
+          id: values[index],
+          avatar_url: item,
+          name:'uno'
+        }
+      }).reverse();
+      // console.warn(objects)
+      this.setState({ listEX: objects })
+ 
+    });
 
 
   };
 
   render() {
+    console.warn(this.state.listEX);
     return (
       <View style={S.container}>
         <HeaderTitle title="Home" />
@@ -64,7 +67,7 @@ class PicsListScreen extends React.Component {
                     style={S.itemImage}
                     source={{ uri: item.avatar_url }}
                   />
-                  <Text  >{item.name}</Text>
+                  <Text  >{item.id}</Text>
                 </View>
               }
             </Card>

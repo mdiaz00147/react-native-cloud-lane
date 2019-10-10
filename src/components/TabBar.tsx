@@ -39,7 +39,7 @@ const TabBar = props => {
             accessibilityLabel={getAccessibilityLabel({ route })}
           >
             {renderIcon({ route, focused: isRouteActive, tintColor: tintColor })}
-            <Text style={{ color: tintColor }} >{getLabelText({ route })}</Text>
+            {/* <Text style={{ color: tintColor }} >{getLabelText({ route })}</Text> */}
           </TouchableOpacity>
         );
       })}
