@@ -4,7 +4,9 @@ import { StyleSheet, View, TouchableOpacity, Image, Platform } from 'react-nativ
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from "react-native-fetch-blob";
+import * as FileSystem from 'expo-file-system';
+import { Base64 } from 'js-base64';
 
 import HeaderTitle from "../components/HeaderTitle";
 import { databaseRef, storageRef } from './../utils/firebase';
@@ -23,18 +25,12 @@ const S = StyleSheet.create({
   }
 });
 
-// Prepare Blob support
-// const Blob = RNFetchBlob.polyfill.Blob
-// const fs = RNFetchBlob.fs
-// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-// window.Blob = Blob
-
-
 class UploadScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
-    picURL: null
+    picURL: null,
+    loading: false
   };
 
   async componentDidMount() {
@@ -43,20 +39,28 @@ class UploadScreen extends React.Component {
   }
 
   snap = async () => {
+    this.setState({ loading: true })
     if (this.camera) {
       let photo = await this.camera.takePictureAsync();
-
-      var store = storageRef.ref().child('productImages/');
-      const uploadUri = Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri
-
-      const metadata = {
-        contentType: 'image/png'
-      };
-
-      console.warn(uploadUri)
-      console.warn(store)
+      this.uploadAsFile(photo.uri)
     }
   };
+
+  uploadAsFile = async (uri) => {
+    let ref = storageRef.ref();
+    ref = ref.child('Ariaana.jpg');
+
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    var metadata = {
+      contentType: 'image/jpeg',
+    };
+    const task = ref.put(blob, metadata).then(function(snapshot) {
+      console.warn('Uploaded a base64 string!');
+    });
+    
+  }
 
   render() {
     const { hasCameraPermission } = this.state;
@@ -75,7 +79,7 @@ class UploadScreen extends React.Component {
               this.camera = ref;
             }}
           >
-          </Camera> 
+          </Camera>
           <View
             style={{
               flex: 1,
@@ -83,15 +87,19 @@ class UploadScreen extends React.Component {
               flexDirection: 'row',
             }}>
             <Image style={S.itemImage} source={{ uri: this.state.picURL }} />
-            <TouchableOpacity
-              style={{
-                flex: 0.1,
-                alignSelf: 'flex-end',
-                alignItems: 'center',
-              }}
-              onPress={() => { this.snap() }}>
-              <Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> SNAP </Text>
-            </TouchableOpacity>
+            {
+              this.state.loading ? (<Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> Subiendo puta foto </Text>) : (
+                <TouchableOpacity
+                  style={{
+                    flex: 0.1,
+                    alignSelf: 'flex-end',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => { this.snap() }}>
+                  <Text style={{ fontSize: 18, marginBottom: 10, color: 'black' }}> SNAP </Text>
+                </TouchableOpacity>
+              )
+            }
           </View>
         </View>
       );

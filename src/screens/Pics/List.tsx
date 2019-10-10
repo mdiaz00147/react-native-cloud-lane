@@ -43,8 +43,8 @@ class PicsListScreen extends React.Component {
   };
 
   componentDidMount() {
-    databaseRef.ref('users/').child(12).set({ name: 'mario andres'});
-    let userRef = databaseRef.ref('users/' + 11);
+    // databaseRef.ref('users/').child(12).set({ name: 'mario andres'});
+    // let userRef = databaseRef.ref('users/' + 11);
     // userRef.remove()
 
 
